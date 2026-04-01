@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install reactivex-python
+          pip install rx
 
       - name: Run tests
         run: python -m unittest discover tests
