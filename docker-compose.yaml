@@ -1,5 +1,15 @@
 
 services:
+
+  processor:
+    image: processor-test
+    container_name: factory-processor
+    env_file:
+      - .env
+    depends_on:
+      - kafka
+      - elasticsearch
+
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka

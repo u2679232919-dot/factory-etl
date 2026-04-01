@@ -28,12 +28,23 @@ def machines_mapping(code):
     return machine_codes()[code]
 
 def properties_mapping(code):
-    # TODO
-    pass
-
+    return {
+    "A7": "LITERS",  
+    "W8": "QUALITY", 
+    "L1": "LIGHT",
+    "T3": "TIME",  
+    "P6": "POWER",  
+    "G8": "GRADES"
+    }[code]
+    
+    
 def attributes_mapping(code):
-    # TODO
-    pass
+    return {
+    "TS": "TIMESTAMP",
+    "MC": "MACHINE",
+    "PR": "PRODUCT",
+    "PS": "PROPS"
+    }[code]
 
 def auxa(event):
     print(f"a: {event}")
@@ -41,9 +52,29 @@ def auxa(event):
 def auxb(event):
     print(f"b: {event}")
 
+def aux(e):
+    print(e)
+
+def auxp(e):
+    for k, v in e['PROPS'].items():
+        e['PROPS'][properties_mapping(k)] = v
+        del e['PROPS'][k]
+        
+
+
 def build_pipeline(source, send_rich_event, save_raw_event, save_rich_event):
     return source.pipe(
+        ops.do_action(save_raw_event),
         ops.do_action(lambda e: print(f"event received: {e}")),
-        # TODO
-        ops.do_action(lambda _: print("rich event send"))
+        ops.map(lambda e: {attributes_mapping(k):e[k] for k in e.keys()}),
+        ops.filter(lambda e: e['MACHINE'] in machine_codes().keys()),
+        # map property codes to property names
+        ops.map(lambda e: {**e, "PROPS": {properties_mapping(k):v for k,v in e["PROPS"].items()}}),
+        #ops.do_action(auxp),
+        # map machine code to machine name
+        ops.map(lambda e: {**e, "MACHINE": machines_mapping(e["MACHINE"])}),
+        ops.do_action(aux),
+        ops.do_action(send_rich_event),
+        ops.do_action(lambda _: print("rich event send")),
+        ops.do_action(save_rich_event)
     )
