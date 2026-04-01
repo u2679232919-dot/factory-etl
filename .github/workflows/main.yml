@@ -7,14 +7,14 @@ on:
   workflow_dispatch:
 
 jobs:
-	build-test-push:
-	  runs-on: ubuntu-latest
+    build-test-push:
+      runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
+      permissions:
+        contents: read
+        packages: write
 
-    steps:
+      steps:
 
       - name: Checkout repo
         uses: actions/checkout@v4
